@@ -11,35 +11,35 @@ namespace VibeCheck.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
-    public class VenueController : ControllerBase
+    public class BandController : ControllerBase
     {
-        private readonly IVenueRepository _venueRepo;
+        private readonly IBandRepository _bandRepo;
 
-        public VenueController(IVenueRepository venueRepository)
+        public BandController(IBandRepository bandRepository)
         {
-            _venueRepo = venueRepository;
+            _bandRepo = bandRepository;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(_venueRepo.GetAllVenues());
+            return Ok(_bandRepo.GetAllBands());
         }
 
         [HttpPost]
 
-        public IActionResult Create(Venue venue)
+        public IActionResult Create(Band band)
         {
-            List<Venue> venues = _venueRepo.GetAllVenues();
-            if (venues.Any(v => v.Name == venue.Name))
+            List<Band> bands = _bandRepo.GetAllBands();
+            if (bands.Any(b => b.Name == band.Name))
             {
-                ModelState.AddModelError("", "Venue already exists.");
+                ModelState.AddModelError("", "Band already exists.");
                 return BadRequest();
             }
             else
             {
-                _venueRepo.AddVenue(venue);
-                return CreatedAtAction("Get", new { id = venue.Id }, venue);
+                _bandRepo.AddBand(band);
+                return CreatedAtAction("Get", new { id = band.Id }, band);
 
             }
 
@@ -50,7 +50,7 @@ namespace VibeCheck.Controllers
         {
             try
             {
-                _venueRepo.DeleteVenue(id);
+                _bandRepo.DeleteBand(id);
                 return Ok();
             }
             catch (Exception ex)
@@ -62,18 +62,18 @@ namespace VibeCheck.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            return Ok(_venueRepo.GetVenueById(id));
+            return Ok(_bandRepo.GetBandById(id));
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(int id, Venue venue)
+        public IActionResult Put(int id, Band band)
         {
-            if (id != venue.Id)
+            if (id != band.Id)
             {
                 return BadRequest();
             }
 
-            _venueRepo.UpdateVenue(venue);
+            _bandRepo.UpdateBand(band);
             return Ok();
         }
 
