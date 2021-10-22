@@ -22,7 +22,7 @@ namespace VibeCheck.Models
         [MaxLength(255)]
         public string Email { get; set; }
 
-        public string ImageUrl { get; set; }
+        public string ImageLocation { get; set; }
 
     }
 }
