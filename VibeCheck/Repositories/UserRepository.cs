@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using VibeCheck.Models;
 using VibeCheck.Utils;
 using Microsoft.Data.SqlClient;
-//using Microsoft.Extensions.Configuration;
 
 namespace VibeCheck.Repositories
 {
