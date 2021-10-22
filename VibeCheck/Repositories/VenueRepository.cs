@@ -9,7 +9,7 @@ using Microsoft.Data.SqlClient;
 
 namespace VibeCheck.Repositories
 {
-    public class VenueRepository : BaseRepository
+    public class VenueRepository : BaseRepository, IVenueRepository
     {
         public VenueRepository(IConfiguration config) : base(config) { }
 
