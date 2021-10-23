@@ -12,8 +12,10 @@ namespace VibeCheck.Models
 
         [Required]
         public int BandId { get; set; }
+        public Band Band { get; set; }
 
         [Required]
         public int UserId { get; set; }
+        public User User { get; set; }
     }
 }
