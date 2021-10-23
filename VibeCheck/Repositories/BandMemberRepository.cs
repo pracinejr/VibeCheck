@@ -9,7 +9,7 @@ using Microsoft.Data.SqlClient;
 
 namespace VibeCheck.Repositories
 {
-    public class BandMemberRepository : BaseRepository, IBandRepository
+    public class BandMemberRepository : BaseRepository, IBandMemberRepository
     {
         public BandMemberRepository(IConfiguration configuration) : base(configuration) { }
 
@@ -42,7 +42,7 @@ namespace VibeCheck.Repositories
             }
         }
 
-        public List<BandMember> GetBandMembersByBandId(int id)
+        public List<BandMember> GetBandMemberByBandId(int id)
         {
             using (var conn = Connection)
             {
@@ -72,6 +72,63 @@ namespace VibeCheck.Repositories
             }
         }
 
+        public void AddBandMember(BandMember bandMember)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO BandMember (BandId, UserId)
+                                        OUTPUT INSERTED.ID
+                                        VALUES ( @BandId, @UserId)";
+                    DbUtils.AddParameter(cmd, "@BandId", bandMember.BandId);
+                    DbUtils.AddParameter(cmd, "@UserId", bandMember.UserId);
+               
+
+
+
+                    bandMember.Id = (int)cmd.ExecuteScalar();
+                }
+            }
+        }
+
+        public void UpdateBandMember(BandMember bandMember)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"UPDATE BandMember
+                                        SET BandId = @BandId,
+                                            UserId = @UserId,    
+                                        WHERE Id = @Id";
+
+                    DbUtils.AddParameter(cmd, "@BandId", bandMember.BandId);
+                    DbUtils.AddParameter(cmd, "@UserId", bandMember.UserId);
+                    DbUtils.AddParameter(cmd, "@Id", bandMember.Id);
+
+
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void DeleteBandMember(int id)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "DELETE FROM BandMember WHERE Id = @Id";
+                    DbUtils.AddParameter(cmd, "@id", id);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
 
 
         private BandMember NewBandMember(SqlDataReader reader)
