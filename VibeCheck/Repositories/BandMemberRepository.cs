@@ -42,6 +42,38 @@ namespace VibeCheck.Repositories
             }
         }
 
+        public List<BandMember> GetBandMembersByBandId(int id)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT b.id AS BandId, b.name AS BandName, u.id AS UserId, u.FirebaseUserId, 
+                                               u.name AS UserName, u.email, u.imageLocation, bm.id, 
+                                               bm.bandId, bm.userId
+                                        FROM bandMember bm
+                                        JOIN [user] u ON u.id = bm.userId
+                                        JOIN band b ON b.id = bm.bandId
+                                        WHERE b.id = @Id";
+
+                    var bandMembers = new List<BandMember>();
+
+                    var reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        bandMembers.Add(NewBandMember(reader));
+                    }
+
+                    reader.Close();
+
+                    return bandMembers;
+                }
+            }
+        }
+
+
+
         private BandMember NewBandMember(SqlDataReader reader)
         {
             return new BandMember()
