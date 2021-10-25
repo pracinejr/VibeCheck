@@ -23,7 +23,7 @@ namespace VibeCheck.Repositories
                     cmd.CommandText = @"
                         SELECT id, FirebaseUserId, [Name], Email, ImageLocation
                         FROM [User] 
-                        WHERE FirebaseUserId = @FirebaseUserId;";
+                        WHERE FirebaseUserId = @FirebaseUserId";
 
                     DbUtils.AddParameter(cmd, "@FirebaseUserId", firebaseUserId);
 
