@@ -15,29 +15,34 @@ namespace VibeCheck.Repositories
 
         public Connection GetConnectionById(int id)
         {
-            using (var conn = this.Connection)
+            using (var conn = Connection)
             {
                 conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"SELECT c.Id, c.UserId AS UserId, c.VenueId, c.MutualFriendId, c.AcquaintanceId,
-	                                           c.DateCreated, c.notes, mf.Id AS FriendId, mf.Name AS FriendName,
-	                                           mf.email AS FriendEmail, mf.ImageLocation AS FriendImage,
+	                                           c.DateCreated, c.notes, mf.Id AS FriendId, mf.Name AS MutualFriendName,
+	                                           mf.email AS MutualFriendEmail, mf.ImageLocation AS MutualFriendImage,
 	                                           a.Id AS AcquaintanceId, a.Name AS AcquaintanceName, a.email
 	                                           AS AcquaintanceEmail, a.ImageLocation AS AcquaintanceImage,
-	                                           v.id, v.name AS VenueName
+	                                           v.id, v.name AS VenueName, u.Id, u.FirebaseUserId, u.Name AS UserName, 
+                                               u.Email AS UserEmail, u.ImageLocation AS UserImage
                                         FROM connection c
                                         JOIN [user] mf ON c.mutualFriendId = mf.id
                                         JOIN [user] a ON c.acquaintanceId = a.id
+                                        JOIN [user] u ON c.UserId = u.Id
                                         JOIN venue v ON c.venueId = v.id
-                                        WHERE c.acquaintanceId = @Id";
+                                        WHERE c.Id = @Id";
+
+                    DbUtils.AddParameter(cmd, "@Id", id);
 
                     var reader = cmd.ExecuteReader();
 
-                    var connections = new List<Connection>();
+                    Connection connection = null;
                     while (reader.Read())
                     {
-                        connections.Add(new Connection()
+                        if (connection == null)
+                            connection = new Connection
                         {
                             Id = DbUtils.GetInt(reader, "Id"),
                             VenueId = DbUtils.GetInt(reader, "VenueId"),
@@ -47,20 +52,20 @@ namespace VibeCheck.Repositories
                                 Name = DbUtils.GetString(reader, "VenueName")
                             },
                             MutualFriendId = DbUtils.GetInt(reader, "MutualFriendId"),
-                            MutualFreind = new User()
+                            MutualFriend = new User()
                             {
                                 Id = DbUtils.GetInt(reader, "Id"),
-                                Name = DbUtils.GetString(reader, "MutualFreindName"),
-                                Email = DbUtils.GetString(reader, "Email"),
-                                ImageLocation = DbUtils.GetString(reader, "ImageLocation")
+                                Name = DbUtils.GetString(reader, "MutualFriendName"),
+                                Email = DbUtils.GetString(reader, "MutualFriendEmail"),
+                                ImageLocation = DbUtils.GetString(reader, "MutualFriendImage")
                             },
                             AcquaintanceId = DbUtils.GetInt(reader, "AcquaintanceId"),
                             Acquaintance = new User()
                             {
                                 Id = DbUtils.GetInt(reader, "Id"),
-                                Name = DbUtils.GetString(reader, "Name"),
-                                Email = DbUtils.GetString(reader, "Email"),
-                                ImageLocation = DbUtils.GetString(reader, "ImageLocation")
+                                Name = DbUtils.GetString(reader, "AcquaintanceName"),
+                                Email = DbUtils.GetString(reader, "AcquaintanceEmail"),
+                                ImageLocation = DbUtils.GetString(reader, "AcquaintanceImage")
                             },
                             DateCreated = DbUtils.GetDateTime(reader, "DateCreated"),
                             Notes = DbUtils.GetString(reader, "Notes"),
@@ -68,16 +73,16 @@ namespace VibeCheck.Repositories
                             User = new User()
                             {
                                 Id = DbUtils.GetInt(reader, "Id"),
-                                Name = DbUtils.GetString(reader, "Name"),
-                                Email = DbUtils.GetString(reader, "Email"),
-                                ImageLocation = DbUtils.GetString(reader, "ImageLocation")
+                                Name = DbUtils.GetString(reader, "UserName"),
+                                Email = DbUtils.GetString(reader, "UserEmail"),
+                                ImageLocation = DbUtils.GetString(reader, "UserImage")
                             },
-                        });
+                        };
                     }
 
                     reader.Close();
 
-                    return connections;
+                    return connection;
                 }
             }
         }
@@ -90,8 +95,8 @@ namespace VibeCheck.Repositories
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"SELECT c.Id, c.UserId AS UserId, c.VenueId, c.MutualFriendId, c.AcquaintanceId,
-	                                           c.DateCreated, c.notes, mf.Id AS FriendId, mf.Name AS FriendName,
-	                                           mf.email AS FriendEmail, mf.ImageLocation AS FriendImage,
+	                                           c.DateCreated, c.notes, mf.Id AS FriendId, mf.Name AS MutualFriendName,
+	                                           mf.email AS MutualFriendEmail, mf.ImageLocation AS MutualFriendImage,
 	                                           a.Id AS AcquaintanceId, a.Name AS AcquaintanceName, a.Email
 	                                           AS AcquaintanceEmail, a.ImageLocation AS AcquaintanceImage,
 	                                           v.Id, v.Name AS VenueName, u.Id, u.FirebaseUserId, u.Name AS UserName, 
@@ -104,7 +109,7 @@ namespace VibeCheck.Repositories
                                         WHERE u.FirebaseUserId = @FirebaseUserId
                                         ORDER BY AcquaintanceName";
 
-                    DbUtils.AddParameter(cmd, "@Id", firebaseUserId);
+                    DbUtils.AddParameter(cmd, "@FirebaseUserId", firebaseUserId);
 
                     var reader = cmd.ExecuteReader();
 
@@ -121,20 +126,20 @@ namespace VibeCheck.Repositories
                                 Name = DbUtils.GetString(reader, "VenueName")
                             },
                             MutualFriendId = DbUtils.GetInt(reader, "MutualFriendId"),
-                            MutualFreind = new User()
+                            MutualFriend = new User()
                             {
                                 Id = DbUtils.GetInt(reader, "Id"),
-                                Name = DbUtils.GetString(reader, "MutualFreindName"),
-                                Email = DbUtils.GetString(reader, "Email"),
-                                ImageLocation = DbUtils.GetString(reader, "ImageLocation")
+                                Name = DbUtils.GetString(reader, "MutualFriendName"),
+                                Email = DbUtils.GetString(reader, "MutualFriendEmail"),
+                                ImageLocation = DbUtils.GetString(reader, "MutualFriendImage")
                             },
                             AcquaintanceId = DbUtils.GetInt(reader, "AcquaintanceId"),
                             Acquaintance = new User()
                             {
                                 Id = DbUtils.GetInt(reader, "Id"),
-                                Name = DbUtils.GetString(reader, "Name"),
-                                Email = DbUtils.GetString(reader, "Email"),
-                                ImageLocation = DbUtils.GetString(reader, "ImageLocation")
+                                Name = DbUtils.GetString(reader, "AcquaintanceName"),
+                                Email = DbUtils.GetString(reader, "AcquaintanceEmail"),
+                                ImageLocation = DbUtils.GetString(reader, "AcquaintanceImage")
                             },
                             DateCreated = DbUtils.GetDateTime(reader, "DateCreated"),
                             Notes = DbUtils.GetString(reader, "Notes"),
@@ -142,9 +147,9 @@ namespace VibeCheck.Repositories
                             User = new User()
                             {
                                 Id = DbUtils.GetInt(reader, "Id"),
-                                Name = DbUtils.GetString(reader, "Name"),
-                                Email = DbUtils.GetString(reader, "Email"),
-                                ImageLocation = DbUtils.GetString(reader, "ImageLocation")
+                                Name = DbUtils.GetString(reader, "UserName"),
+                                Email = DbUtils.GetString(reader, "UserEmail"),
+                                ImageLocation = DbUtils.GetString(reader, "UserImage")
                             },
                         });
                     }
