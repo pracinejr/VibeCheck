@@ -26,6 +26,7 @@ namespace VibeCheck
             services.AddTransient<IBandRepository, BandRepository>();
             services.AddTransient<IBandMemberRepository, BandMemberRepository>();
             services.AddTransient<IVenueRepository, VenueRepository>();
+            services.AddTransient<IConnectionRepository, ConnectionRepository>();
 
             var firebaseProjectId = Configuration.GetValue<string>("FirebaseProjectId");
             var googleTokenUrl = $"https://securetoken.google.com/{firebaseProjectId}";

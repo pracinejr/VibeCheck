@@ -16,7 +16,7 @@ namespace VibeCheck.Models
         public int VenueId { get; set; }
         public Venue Venue { get; set; }
         public int MutualFriendId { get; set; }
-        public User MutualFreind { get; set; }
+        public User MutualFriend { get; set; }
         [Required]
         public int AcquaintanceId { get; set; }
         public User Acquaintance { get; set; }

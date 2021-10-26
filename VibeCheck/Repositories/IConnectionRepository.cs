@@ -3,7 +3,7 @@ using VibeCheck.Models;
 
 namespace VibeCheck.Repositories
 {
-    interface IConnectionRepository
+    public interface IConnectionRepository
     {
         Connection GetConnectionById(int id);
         List<Connection> GetUsersConnections(string firebaseUserId);
