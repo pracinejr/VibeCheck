@@ -1,8 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using VibeCheck.Models;
 using VibeCheck.Utils;
 using Microsoft.Data.SqlClient;
@@ -55,7 +52,7 @@ namespace VibeCheck.Repositories
                 conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO User (FirebaseUserId, Name, Email, ImageLocation)
+                    cmd.CommandText = @"INSERT INTO [User] (FirebaseUserId, [Name], Email, ImageLocation)
                                         OUTPUT INSERTED.ID
                                         VALUES (@FirebaseUserId, @Name, @Email, @ImageLocation)";
                     DbUtils.AddParameter(cmd, "@FirebaseUserId", user.FirebaseUserId);
