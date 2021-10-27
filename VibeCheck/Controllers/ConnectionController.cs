@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Security.Claims;
 using System.Collections.Generic;
 using System.Linq;
 using VibeCheck.Models;
@@ -13,23 +15,30 @@ namespace VibeCheck.Controllers
     public class ConnectionController : ControllerBase
     {
         private readonly IConnectionRepository _connectionRepo;
+        private readonly IUserRepository _userRepo;
 
-        public ConnectionController(IConnectionRepository connectionRepository)
+        public ConnectionController(IConnectionRepository connectionRepository, IUserRepository userRepository)
         {
-            _connectionRepo = connectionRepository; 
+            _connectionRepo = connectionRepository;
+            _userRepo = userRepository;
         }
 
-        [HttpGet("{firebaseUserId}")]
-        public IActionResult Get(string firebaseUserId)
+        [HttpGet("GetMyConnections")]
+        public IActionResult Get()
         {
-            return Ok(_connectionRepo.GetUsersConnections(firebaseUserId));
+            var currentUser = GetCurrentUser();
+
+            var connections = _connectionRepo.GetUsersConnections(currentUser.Id);
+
+            return Ok(connections);
         }
 
         [HttpPost]
 
-        public IActionResult Create(Connection connection, string firebaseUserId)
+        public IActionResult Create(Connection connection)
         {
-            List<Connection> connections = _connectionRepo.GetUsersConnections(firebaseUserId);
+            var currentUser = GetCurrentUser();
+            List<Connection> connections = _connectionRepo.GetUsersConnections(currentUser.Id);
             if (connections.Any(b => b.AcquaintanceId == connection.AcquaintanceId))
             {
                 ModelState.AddModelError("", "Connection already exists.");
@@ -45,7 +54,7 @@ namespace VibeCheck.Controllers
         }
 
         [HttpGet("GetById/{id}")]
-        public IActionResult Get(int id)
+        public IActionResult GetByConnectionId(int id)
         {
             return Ok(_connectionRepo.GetConnectionById(id));
         }
@@ -60,6 +69,19 @@ namespace VibeCheck.Controllers
 
             _connectionRepo.UpdateConnection(connection);
             return Ok();
+        }
+
+        private User GetCurrentUser()
+        {
+            var firebaseUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (firebaseUserId != null)
+            {
+                return _userRepo.GetByFirebaseUserId(firebaseUserId);
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

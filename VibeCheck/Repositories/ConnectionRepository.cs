@@ -87,7 +87,7 @@ namespace VibeCheck.Repositories
             }
         }
 
-        public List<Connection> GetUsersConnections(string firebaseUserId)
+        public List<Connection> GetUsersConnections(int currentUser)
         {
             using (var conn = this.Connection)
             {
@@ -106,10 +106,9 @@ namespace VibeCheck.Repositories
                                         JOIN [user] a ON c.acquaintanceId = a.Id
                                         JOIN [user] u ON c.UserId = u.Id
                                         JOIN venue v ON c.venueId = v.Id
-                                        WHERE u.FirebaseUserId = @FirebaseUserId
+                                        WHERE UserId = @Id
                                         ORDER BY AcquaintanceName";
-
-                    DbUtils.AddParameter(cmd, "@FirebaseUserId", firebaseUserId);
+                    cmd.Parameters.AddWithValue("@Id", currentUser);
 
                     var reader = cmd.ExecuteReader();
 
